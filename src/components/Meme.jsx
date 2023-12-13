@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import download from "downloadjs";
+import { toPng } from "html-to-image";
+import Draggable from "react-draggable";
 
 const Meme = () => {
   const [meme, setMeme] = useState({
@@ -30,6 +33,23 @@ const Meme = () => {
     }));
   };
 
+  const clearInput = () => {
+    setMeme((prevMeme) => ({
+      ...prevMeme,
+      topText: "",
+      bottomText: "",
+    }));
+  };
+
+  const node = document.getElementById("meme-img");
+  const downloadImage = () => {
+    toPng(node)
+      .then((dataURL) => {
+        download(dataURL, "meme.png");
+      })
+      .catch(() => console.log("error occured"));
+  };
+
   return (
     <main>
       <div className="form">
@@ -52,11 +72,23 @@ const Meme = () => {
         <button type="submit" className="form--btn" onClick={getMemeImage}>
           Get a new meme image 🖼️
         </button>
+        <button type="button" className="form--btn" onClick={clearInput}>
+          Clear Text
+        </button>
       </div>
-      <div className="meme">
+      <div className="meme" id="meme-img">
         <img src={meme.randomImage} className="meme--img" />
-        <h2 className="meme--text top">{meme.topText}</h2>
-        <h2 className="meme--text bottom">{meme.bottomText}</h2>
+        <Draggable bounds="parent">
+          <h2 className="meme--text top">{meme.topText}</h2>
+        </Draggable>
+        <Draggable bounds="parent">
+          <h2 className="meme--text bottom">{meme.bottomText}</h2>
+        </Draggable>
+      </div>
+      <div className="download--section">
+        <button type="button" className="download--btn" onClick={downloadImage}>
+          Download Meme
+        </button>
       </div>
     </main>
   );
